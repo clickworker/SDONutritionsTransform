@@ -4,6 +4,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.apache.poi.ss.usermodel.BuiltinFormats;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -62,7 +66,10 @@ public class DataTransformService {
 	private String columnNameAlcohol = "percentageOfAlcoholByVolume [%]";
 	private String columnNamesVitamins = "Vitamine / Mineralien: Code [count],Vitamine / Mineralien: Menge [count],Vitamine / Mineralien: Maßeinheit [count],Vitamine / Mineralien: Messgenauigkeit [count],Vitamine / Mineralien: % der Nährstoffbezugswerte [count]";
 	private String columnNamesOther = "Sonstige Nährwertangaben: Bestandteil [0],Sonstige Nährwertangaben: Wert [0],Sonstige Nährwertangaben: Maßeinheit [0],Sonstige Nährwertangaben: Messgenauigkeit [0],Sonstige Nährwertangaben: % der Referenzmenge [0]";
-
+	
+	private CellStyle textCellStyle = null;
+		
+	
 	public ArrayList<Product> transferDataFromSourceToModel(String sourceFile) throws IOException{
 		ArrayList<Product> products = this.createModelFromSource(sourceFile);
 
@@ -223,34 +230,47 @@ public class DataTransformService {
 
 		return products;
 	}
-
+	
+	
+	
+	private Cell createTextCellWithValue(Row row, int colIndex, String value){
+		Cell cell = row.createCell(colIndex);
+		cell.setCellValue(value);
+		cell.setCellStyle(textCellStyle);
+		return cell;
+	}
+	
 	public void writeModelToSheet(ArrayList<Product> products, String targetFile) throws IOException, Exception{
 		Workbook targetWB = new XSSFWorkbook();
+		this.textCellStyle = targetWB.createCellStyle();
+		textCellStyle.setDataFormat((short)BuiltinFormats.getBuiltinFormat("text"));
+		
 		Sheet targetSheet = targetWB.createSheet();
+		
 		int rowIndex = 1;
-
 		this.writeHeaderToTarget(targetSheet, products);
 
 		for(Product prod : products){
 			Row row = targetSheet.createRow(rowIndex);
 
-			row.createCell(GTIN_DER_ARTIKELEINHEIT).setCellValue(prod.getGtin());
+			this.createTextCellWithValue(row, GTIN_DER_ARTIKELEINHEIT, prod.getGtin());
+			
 
 			if(prod.getPrepState().equals("unprepared")){
-				row.createCell(NÄHRSTOFF_ZUBEREITUNGSGRAD).setCellValue("UNPREPARED");
+				this.createTextCellWithValue(row, NÄHRSTOFF_ZUBEREITUNGSGRAD, "UNPREPARED");
 			}else if(prod.getPrepState().equals("prepared")){
-				row.createCell(NÄHRSTOFF_ZUBEREITUNGSGRAD).setCellValue("PREPARED");
+				this.createTextCellWithValue(row, NÄHRSTOFF_ZUBEREITUNGSGRAD, "PREPARED");
 			}else{
-				row.createCell(NÄHRSTOFF_ZUBEREITUNGSGRAD).setCellValue("");
+				this.createTextCellWithValue(row, NÄHRSTOFF_ZUBEREITUNGSGRAD, "");
 			}
-
-			row.createCell(BRENNWERT_KCAL).setCellValue(prod.getKcal().trim().equals("") ? "N/A" : prod.getKcal().trim());
-			row.createCell(BRENNWERT_KJ).setCellValue(prod.getKj().trim().equals("") ? "N/A" : prod.getKj().trim());
-			row.createCell(BRENNWERT_MESSGENAUIGKEIT).setCellValue(prod.getKj().trim().equals("") ? "N/A" : prod.getKj().trim().indexOf("<") > -1 ?
+			
+			this.createTextCellWithValue(row, BRENNWERT_KCAL, prod.getKcal().trim().equals("") ? "N/A" : prod.getKcal().trim());
+			this.createTextCellWithValue(row, BRENNWERT_KJ, prod.getKj().trim().equals("") ? "N/A" : prod.getKj().trim());
+			this.createTextCellWithValue(row, BRENNWERT_MESSGENAUIGKEIT, prod.getKj().trim().equals("") ? "N/A" : prod.getKj().trim().indexOf("<") > -1 ?
 					"LESS_THAN" :
 			"APPROXIMATELY");
-			row.createCell(BRENNWERT_KJ_PERC_RDA).setCellValue("");
-			row.createCell(PERCENTAGEOFALCOHOLBYVOLUME_PERC).setCellValue(prod.getAlcohol().trim().equals("") ? "N/A" : prod.getAlcohol().trim());
+			this.createTextCellWithValue(row, BRENNWERT_KJ_PERC_RDA, "");
+			this.createTextCellWithValue(row, PERCENTAGEOFALCOHOLBYVOLUME_PERC, prod.getAlcohol().trim().equals("") ? "N/A" : prod.getAlcohol().trim());
 
 			int columnStartIndexOfNextNutrition = NÄHRWERTANGABEN_BESTANDTEIL_0;
 			int multiValueNutritionsCount = 0;
@@ -260,33 +280,33 @@ public class DataTransformService {
 
 
 					if(multiValueNutritionsCount < 1){ //needs to be done only one time per row
-						row.createCell(PORTIONSGRÖßE).setCellValue(nutrition.getValue().equals("") ? "N/A" : "100");
+						this.createTextCellWithValue(row, PORTIONSGRÖßE, nutrition.getValue().equals("") ? "N/A" : "100");
 					}
 
 
 					if(multiValueNutritionsCount < 1){ //needs to be done only one time per row							
-						row.createCell(PORTIONSGRÖßE_MAßEINHEIT).setCellValue(prod.getBase());
+						this.createTextCellWithValue(row, PORTIONSGRÖßE_MAßEINHEIT, prod.getBase());
 					}
 
-					row.createCell(columnStartIndexOfNextNutrition).setCellValue(nutrition.getValue().equals("") ? "N/A" : nutrition.getName());
+					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition, nutrition.getValue().equals("") ? "N/A" : nutrition.getName());
 
-					row.createCell(columnStartIndexOfNextNutrition+1).setCellValue(nutrition.getValue().equals("") ? "N/A" : nutrition.getValue());
-					row.createCell(columnStartIndexOfNextNutrition+2).setCellValue(nutrition.getValue().equals("") ? "N/A" : "GR");
-					row.createCell(columnStartIndexOfNextNutrition+3).setCellValue(nutrition.getValue().equals("") ? "N/A" : nutrition.getValue().indexOf("<") > -1 ?
+					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+1, nutrition.getValue().equals("") ? "N/A" : nutrition.getValue());
+					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+2, nutrition.getValue().equals("") ? "N/A" : "GR");
+					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+3, nutrition.getValue().equals("") ? "N/A" : nutrition.getValue().indexOf("<") > -1 ?
 							"LESS_THAN" :
 					"APPROXIMATELY");
-					row.createCell(columnStartIndexOfNextNutrition+4).setCellValue("");
+					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+4, "");
 
 					multiValueNutritionsCount++;
 					columnStartIndexOfNextNutrition += 5;
 				}else if(nutrition.getName().trim().equals("NA")){ //special treatment of natrium
-					row.createCell(SONSTIGE_NÄHRWERTANGABEN_BESTANDTEIL_0).setCellValue(nutrition.getValue().trim().equals("") ? "N/A" : nutrition.getName().trim());
-					row.createCell(SONSTIGE_NÄHRWERTANGABEN_WERT_0).setCellValue(nutrition.getValue().trim().equals("") ? "N/A" : nutrition.getValue().trim());
-					row.createCell(SONSTIGE_NÄHRWERTANGABEN_MAßEINHEIT_0).setCellValue(nutrition.getValue().trim().equals("") ? "N/A" : "GR");
-					row.createCell(SONSTIGE_NÄHRWERTANGABEN_MESSGENAUIGKEIT_0).setCellValue(nutrition.getValue().trim().equals("")  ? "N/A" : nutrition.getValue().indexOf("<") > -1 ?
+					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_BESTANDTEIL_0, nutrition.getValue().trim().equals("") ? "N/A" : nutrition.getName().trim());
+					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_WERT_0, nutrition.getValue().trim().equals("") ? "N/A" : nutrition.getValue().trim());
+					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_MAßEINHEIT_0, nutrition.getValue().trim().equals("") ? "N/A" : "GR");
+					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_MESSGENAUIGKEIT_0, nutrition.getValue().trim().equals("")  ? "N/A" : nutrition.getValue().indexOf("<") > -1 ?
 							"LESS_THAN" :
 					"APPROXIMATELY");
-					row.createCell(SONSTIGE_NÄHRWERTANGABEN_PERC_DER_REFERENZMENGE_0).setCellValue("");
+					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_PERC_DER_REFERENZMENGE_0, "");
 				}else if(nutrition.getType() != NutritionType.VITAMIN){
 					System.out.println("Skipped Nutrition: " + nutrition.getName());
 					continue;
@@ -302,7 +322,7 @@ public class DataTransformService {
 		Row row = targetSheet.createRow(0);
 		int columnIndex = 0;
 		for(String columnName : this.columnNamesCSV.split(",")){
-			row.createCell(columnIndex).setCellValue(columnName);
+			this.createTextCellWithValue(row, columnIndex, columnName);
 			columnIndex++;
 		}
 
@@ -312,12 +332,12 @@ public class DataTransformService {
 		for(int i = 0; i < maxNutritions; ++i){
 			columnNames = columnNamesNutritions.replaceAll("count", i + "");
 			for(String columnName : columnNames.split(",")){
-				row.createCell(columnIndex).setCellValue(columnName);
+				this.createTextCellWithValue(row, columnIndex, columnName);
 				columnIndex++;
 			}
 		}
 		PERCENTAGEOFALCOHOLBYVOLUME_PERC = columnIndex;
-		row.createCell(PERCENTAGEOFALCOHOLBYVOLUME_PERC).setCellValue(columnNameAlcohol);
+		this.createTextCellWithValue(row, PERCENTAGEOFALCOHOLBYVOLUME_PERC, columnNameAlcohol);
 		columnIndex++;
 		VITAMINE_MINERALIEN_CODE_0 = columnIndex;
 		short maxVitamins = this.getMaxCountOfVitamins(products);
@@ -325,7 +345,7 @@ public class DataTransformService {
 		for(int i = 0; i < maxVitamins; ++i){
 			vitColumnNames = columnNamesVitamins.replaceAll("count", i + "");
 			for(String columnName : vitColumnNames.split(",")){
-				row.createCell(columnIndex).setCellValue(columnName);
+				this.createTextCellWithValue(row, columnIndex, columnName);
 				columnIndex++;
 			}
 		}
@@ -337,7 +357,7 @@ public class DataTransformService {
 		SONSTIGE_NÄHRWERTANGABEN_PERC_DER_REFERENZMENGE_0 = columnIndex+4;
 		if(this.hasOther(products)){
 			for(String columnName : columnNamesOther.split(",")){
-				row.createCell(columnIndex).setCellValue(columnName);
+				this.createTextCellWithValue(row, columnIndex, columnName);
 				columnIndex++;
 			}
 		}
@@ -421,22 +441,22 @@ public class DataTransformService {
 
 			if(nut.getType() == NutritionType.VITAMIN && nut.isMultiValueNutrition()){
 
-				row.createCell(startIndexOfNextNutrition).setCellValue(nut.getValue().equals("") ? "N/A" : nut.getName());
-				row.createCell(startIndexOfNextNutrition+1).setCellValue(nut.getValue().equals("") ? "N/A" : nut.getValue());
-				row.createCell(startIndexOfNextNutrition+2).setCellValue(nut.getValue().equals("") ? "N/A" : nut.getBase()); //TODO: getBase need to map value to correct name
-				row.createCell(startIndexOfNextNutrition+3).setCellValue(nut.getValue().trim().equals("")  ? "N/A" : nut.getValue().indexOf("<") > -1 ? "LESS_THAN" : "APPROXIMATELY");
-				row.createCell(startIndexOfNextNutrition+4).setCellValue("");
+				this.createTextCellWithValue(row, startIndexOfNextNutrition, nut.getValue().equals("") ? "N/A" : nut.getName());
+				this.createTextCellWithValue(row, startIndexOfNextNutrition+1, nut.getValue().equals("") ? "N/A" : nut.getValue());
+				this.createTextCellWithValue(row, startIndexOfNextNutrition+2, nut.getValue().equals("") ? "N/A" : nut.getBase()); //TODO: getBase need to map value to correct name
+				this.createTextCellWithValue(row, startIndexOfNextNutrition+3, nut.getValue().trim().equals("")  ? "N/A" : nut.getValue().indexOf("<") > -1 ? "LESS_THAN" : "APPROXIMATELY");
+				this.createTextCellWithValue(row, startIndexOfNextNutrition+4, "");
 				startIndexOfNextNutrition += 5;
 				countOfVitamins++;
 			}
 		}
 
 		/*for(;countOfVitamins < this.getMaxCountOfVitamins();countOfVitamins++){
-			row.createCell(startIndexOfNextNutrition).setCellValue("N/A");
-			row.createCell(startIndexOfNextNutrition+1).setCellValue("N/A");
-			row.createCell(startIndexOfNextNutrition+2).setCellValue("N/A");
-			row.createCell(startIndexOfNextNutrition+3).setCellValue("N/A");
-			row.createCell(startIndexOfNextNutrition+4).setCellValue("N/A");
+			this.createTextCellWithValue(row, startIndexOfNextNutrition).setCellValue("N/A");
+			this.createTextCellWithValue(row, startIndexOfNextNutrition+1).setCellValue("N/A");
+			this.createTextCellWithValue(row, startIndexOfNextNutrition+2).setCellValue("N/A");
+			this.createTextCellWithValue(row, startIndexOfNextNutrition+3).setCellValue("N/A");
+			this.createTextCellWithValue(row, startIndexOfNextNutrition+4).setCellValue("N/A");
 			startIndexOfNextNutrition += 5;
 			//countOfVitamins++;
 		}*/
