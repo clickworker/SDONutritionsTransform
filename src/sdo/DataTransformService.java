@@ -279,7 +279,7 @@ public class DataTransformService {
 
 
 					if(multiValueNutritionsCount < 1){ //needs to be done only one time per row
-						this.createTextCellWithValue(row, PORTIONSGRÖßE, nutrition.getValue().equals("") ? "N/A" : "100");
+						this.createTextCellWithValue(row, PORTIONSGRÖßE, nutrition.getValue().equals("") ? "" : "100");
 					}
 
 
@@ -287,11 +287,11 @@ public class DataTransformService {
 						this.createTextCellWithValue(row, PORTIONSGRÖßE_MAßEINHEIT, prod.getBase());
 					}
 
-					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition, nutrition.getValue().equals("") ? "N/A" : nutrition.getName());
+					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition, nutrition.getValue().equals("") ? "" : nutrition.getName());
 
-					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+1, nutrition.getValue().equals("") ? "N/A" : nutrition.getValue());
-					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+2, nutrition.getValue().equals("") ? "N/A" : "GR");
-					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+3, nutrition.getValue().equals("") ? "N/A" : nutrition.getValue().indexOf("<") > -1 ?
+					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+1, nutrition.getValue().equals("") ? "" : nutrition.getValue());
+					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+2, nutrition.getValue().equals("") ? "" : "GR");
+					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+3, nutrition.getValue().equals("") ? "" : nutrition.getValue().indexOf("<") > -1 ?
 							"LESS_THAN" :
 					"APPROXIMATELY");
 					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+4, "");
@@ -299,10 +299,10 @@ public class DataTransformService {
 					multiValueNutritionsCount++;
 					columnStartIndexOfNextNutrition += 5;
 				}else if(nutrition.getName().trim().equals("NA")){ //special treatment of natrium
-					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_BESTANDTEIL_0, nutrition.getValue().trim().equals("") ? "N/A" : nutrition.getName().trim());
-					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_WERT_0, nutrition.getValue().trim().equals("") ? "N/A" : nutrition.getValue().trim());
-					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_MAßEINHEIT_0, nutrition.getValue().trim().equals("") ? "N/A" : "GR");
-					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_MESSGENAUIGKEIT_0, nutrition.getValue().trim().equals("")  ? "N/A" : nutrition.getValue().indexOf("<") > -1 ?
+					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_BESTANDTEIL_0, nutrition.getValue().trim().equals("") ? "" : nutrition.getName().trim());
+					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_WERT_0, nutrition.getValue().trim().equals("") ? "" : nutrition.getValue().trim());
+					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_MAßEINHEIT_0, nutrition.getValue().trim().equals("") ? "" : "GR");
+					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_MESSGENAUIGKEIT_0, nutrition.getValue().trim().equals("")  ? "" : nutrition.getValue().indexOf("<") > -1 ?
 							"LESS_THAN" :
 					"APPROXIMATELY");
 					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_PERC_DER_REFERENZMENGE_0, "");
@@ -440,10 +440,10 @@ public class DataTransformService {
 
 			if(nut.getType() == NutritionType.VITAMIN && nut.isMultiValueNutrition()){
 
-				this.createTextCellWithValue(row, startIndexOfNextNutrition, nut.getValue().equals("") ? "N/A" : nut.getName());
-				this.createTextCellWithValue(row, startIndexOfNextNutrition+1, nut.getValue().equals("") ? "N/A" : nut.getValue());
-				this.createTextCellWithValue(row, startIndexOfNextNutrition+2, nut.getValue().equals("") ? "N/A" : nut.getBase()); //TODO: getBase need to map value to correct name
-				this.createTextCellWithValue(row, startIndexOfNextNutrition+3, nut.getValue().trim().equals("")  ? "N/A" : nut.getValue().indexOf("<") > -1 ? "LESS_THAN" : "APPROXIMATELY");
+				this.createTextCellWithValue(row, startIndexOfNextNutrition, nut.getValue().equals("") ? "" : nut.getName());
+				this.createTextCellWithValue(row, startIndexOfNextNutrition+1, nut.getValue().equals("") ? "" : nut.getValue());
+				this.createTextCellWithValue(row, startIndexOfNextNutrition+2, nut.getValue().equals("") ? "" : nut.getBase()); //TODO: getBase need to map value to correct name
+				this.createTextCellWithValue(row, startIndexOfNextNutrition+3, nut.getValue().trim().equals("")  ? "" : nut.getValue().indexOf("<") > -1 ? "LESS_THAN" : "APPROXIMATELY");
 				this.createTextCellWithValue(row, startIndexOfNextNutrition+4, "");
 				startIndexOfNextNutrition += 5;
 				countOfVitamins++;
