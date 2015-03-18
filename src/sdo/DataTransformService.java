@@ -263,13 +263,13 @@ public class DataTransformService {
 				this.createTextCellWithValue(row, NÄHRSTOFF_ZUBEREITUNGSGRAD, "");
 			}
 			
-			this.createTextCellWithValue(row, BRENNWERT_KCAL, prod.getKcal().trim().equals("") ? "N/A" : prod.getKcal().trim());
-			this.createTextCellWithValue(row, BRENNWERT_KJ, prod.getKj().trim().equals("") ? "N/A" : prod.getKj().trim());
-			this.createTextCellWithValue(row, BRENNWERT_MESSGENAUIGKEIT, prod.getKj().trim().equals("") ? "N/A" : prod.getKj().trim().indexOf("<") > -1 ?
+			this.createTextCellWithValue(row, BRENNWERT_KCAL, prod.getKcal().trim().equals("") ? "" : prod.getKcal().trim());
+			this.createTextCellWithValue(row, BRENNWERT_KJ, prod.getKj().trim().equals("") ? "" : prod.getKj().trim());
+			this.createTextCellWithValue(row, BRENNWERT_MESSGENAUIGKEIT, prod.getKj().trim().equals("") ? "" : prod.getKj().trim().indexOf("<") > -1 ?
 					"LESS_THAN" :
 			"APPROXIMATELY");
 			this.createTextCellWithValue(row, BRENNWERT_KJ_PERC_RDA, "");
-			this.createTextCellWithValue(row, PERCENTAGEOFALCOHOLBYVOLUME_PERC, prod.getAlcohol().trim().equals("") ? "N/A" : prod.getAlcohol().trim());
+			this.createTextCellWithValue(row, PERCENTAGEOFALCOHOLBYVOLUME_PERC, prod.getAlcohol().trim().equals("") ? "" : prod.getAlcohol().trim());
 
 			int columnStartIndexOfNextNutrition = NÄHRWERTANGABEN_BESTANDTEIL_0;
 			int multiValueNutritionsCount = 0;
