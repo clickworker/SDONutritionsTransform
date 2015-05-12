@@ -230,8 +230,6 @@ public class DataTransformService {
 		return products;
 	}
 	
-	
-	
 	private Cell createTextCellWithValue(Row row, int colIndex, String value){
 		Cell cell = row.createCell(colIndex);
 		cell.setCellValue(value);
@@ -265,7 +263,7 @@ public class DataTransformService {
 			
 			this.createTextCellWithValue(row, BRENNWERT_KCAL, prod.getKcal().trim().equals("") ? "" : prod.getKcal().trim());
 			this.createTextCellWithValue(row, BRENNWERT_KJ, prod.getKj().trim().equals("") ? "" : prod.getKj().trim());
-			this.createTextCellWithValue(row, BRENNWERT_MESSGENAUIGKEIT, prod.getKj().trim().equals("") ? "" : prod.getKj().trim().indexOf("<") > -1 ?
+			this.createTextCellWithValue(row, BRENNWERT_MESSGENAUIGKEIT, prod.getKj().trim().equals("") ? "" : prod.isKjLessThan() ?
 					"LESS_THAN" :
 			"APPROXIMATELY");
 			this.createTextCellWithValue(row, BRENNWERT_KJ_PERC_RDA, "");
@@ -291,7 +289,7 @@ public class DataTransformService {
 
 					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+1, nutrition.getValue().equals("") ? "" : nutrition.getValue());
 					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+2, nutrition.getValue().equals("") ? "" : "GR");
-					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+3, nutrition.getValue().equals("") ? "" : nutrition.getValue().indexOf("<") > -1 ?
+					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+3, nutrition.getValue().equals("") ? "" : nutrition.isLessThan() ?
 							"LESS_THAN" :
 					"APPROXIMATELY");
 					this.createTextCellWithValue(row, columnStartIndexOfNextNutrition+4, "");
@@ -302,7 +300,7 @@ public class DataTransformService {
 					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_BESTANDTEIL_0, nutrition.getValue().trim().equals("") ? "" : nutrition.getName().trim());
 					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_WERT_0, nutrition.getValue().trim().equals("") ? "" : nutrition.getValue().trim());
 					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_MAßEINHEIT_0, nutrition.getValue().trim().equals("") ? "" : "GR");
-					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_MESSGENAUIGKEIT_0, nutrition.getValue().trim().equals("")  ? "" : nutrition.getValue().indexOf("<") > -1 ?
+					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_MESSGENAUIGKEIT_0, nutrition.getValue().trim().equals("")  ? "" : nutrition.isLessThan() ?
 							"LESS_THAN" :
 					"APPROXIMATELY");
 					this.createTextCellWithValue(row, SONSTIGE_NÄHRWERTANGABEN_PERC_DER_REFERENZMENGE_0, "");
@@ -443,7 +441,7 @@ public class DataTransformService {
 				this.createTextCellWithValue(row, startIndexOfNextNutrition, nut.getValue().equals("") ? "" : nut.getName());
 				this.createTextCellWithValue(row, startIndexOfNextNutrition+1, nut.getValue().equals("") ? "" : nut.getValue());
 				this.createTextCellWithValue(row, startIndexOfNextNutrition+2, nut.getValue().equals("") ? "" : nut.getBase()); //TODO: getBase need to map value to correct name
-				this.createTextCellWithValue(row, startIndexOfNextNutrition+3, nut.getValue().trim().equals("")  ? "" : nut.getValue().indexOf("<") > -1 ? "LESS_THAN" : "APPROXIMATELY");
+				this.createTextCellWithValue(row, startIndexOfNextNutrition+3, nut.getValue().trim().equals("")  ? "" : nut.isLessThan() ? "LESS_THAN" : "APPROXIMATELY");
 				this.createTextCellWithValue(row, startIndexOfNextNutrition+4, "");
 				startIndexOfNextNutrition += 5;
 				countOfVitamins++;

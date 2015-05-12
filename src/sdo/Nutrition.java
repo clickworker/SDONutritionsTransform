@@ -48,11 +48,16 @@ public class Nutrition implements Comparable<Nutrition>{
 		this.name = name;
 	}
 	public String getValue() {
-		return value;
+		return value.replaceAll("<", "");
 	}
 	public void setValue(String value) {
 		this.value = value;
 	}
+	
+	public boolean isLessThan(){
+		return this.value.trim().indexOf("<") > -1;
+	}
+	
 	@Override
 	public String toString() {
 		return "Nutrition [base=" + base + ", name=" + name + ", value="

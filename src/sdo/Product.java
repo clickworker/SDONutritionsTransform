@@ -72,13 +72,22 @@ public class Product {
 		this.prepState = prepState;
 	}
 	public String getKj() {
-		return kj;
+		return kj.replaceAll("<", "");
 	}
 	public void setKj(String kj) {
 		this.kj = kj;
 	}
+	
+	public boolean isKjLessThan(){
+		return this.kj.trim().indexOf("<") > -1;
+	}
+	
+	public boolean isKcalLessThan(){
+		return this.kcal.trim().indexOf("<") > -1;
+	}
+	
 	public String getKcal() {
-		return kcal;
+		return kcal.replaceAll("<", "");
 	}
 	public void setKcal(String kcal) {
 		this.kcal = kcal;
